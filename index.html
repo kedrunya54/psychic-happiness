@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>История</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+        overflow: hidden;
+        height: 100vh;
+        background: #000;
+        font-family: Arial, sans-serif;
+    }
+
+    #scene {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #bg {
+        position: absolute;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        z-index: 1;
+    }
+
+    .character {
+        position: absolute;
+        bottom: 30%;
+        text-align: center;
+        transition: all 1.3s ease;
+        z-index: 10;
+    }
+
+    .character img {
+        width: auto;
+        height: auto;
+        max-height: 24vh;
+        max-width: 28vw;
+        display: block;
+        border-radius: 6px;
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    }
+
+    .name {
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+        text-shadow: 0 0 6px black, 0 0 3px black;
+        margin-bottom: 4px;
+        white-space: nowrap;
+    }
+
+    /* Стартовые позиции */
+    #sam { left: 10%; }
+    #sem { left: 55%; }
+    #vay { 
+        left: 110%; 
+        opacity: 0;
+    }
+
+    /* При поцелуях имена прячем */
+    .kissing .name,
+    .final-kiss .name {
+        opacity: 0;
+    }
+
+    .bubble {
+        position: absolute;
+        background: white;
+        color: #222;
+        padding: 9px 13px;
+        border-radius: 14px;
+        font-size: 13px;
+        max-width: 170px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+        opacity: 0;
+        transition: opacity 0.4s;
+        z-index: 30;
+        pointer-events: none;
+    }
+
+    .bubble::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: white;
+    }
+
+    /* Пузыри ниже */
+    #bubble-sam { left: 7%; bottom: 51%; }
+    #bubble-sem { left: 53%; bottom: 51%; }
+    #bubble-vay { 
+        left: 62%; 
+        bottom: 53%;
+        background: #ffe66d;
+    }
+    #bubble-vay::after { border-top-color: #ffe66d; }
+
+    /* Поцелуй sam + sem */
+    .kissing #sam { left: 30%; }
+    .kissing #sem { left: 44%; }
+
+    /* Финальный поцелуй */
+    .final-kiss #sem { left: 44%; }
+    .final-kiss #vay { left: 30%; opacity: 1; }
+
+    .sad #sam img { filter: grayscale(70%) brightness(0.8); }
+    
+    .dying #sam {
+        opacity: 0;
+        transform: scale(0.5) translateY(30px);
+        transition: all 3s ease;
+    }
+
+    #overlay {
+        position: absolute;
+        inset: 0;
+        background: transparent;
+        transition: background 2.5s;
+        z-index: 40;
+        pointer-events: none;
+    }
+    .dark #overlay { background: rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+    <div id="scene">
+        <img id="bg" src="fon.png" alt="фон">
+
+        <div id="overlay"></div>
+
+        <div id="sam" class="character">
+            <div class="name">порочная</div>
+            <img src="sam.png" alt="sam">
+        </div>
+
+        <div id="sem" class="character">
+            <div class="name">виноградова</div>
+            <img src="sem.png" alt="sem">
+        </div>
+
+        <div id="vay" class="character">
+            <div class="name">юморная</div>
+            <img src="vay.png" alt="vay">
+        </div>
+
+        <div id="bubble-sam" class="bubble"></div>
+        <div id="bubble-sem" class="bubble"></div>
+        <div id="bubble-vay" class="bubble"></div>
+    </div>
+
+<script>
+    const scene = document.getElementById('scene');
+    const bSam = document.getElementById('bubble-sam');
+    const bSem = document.getElementById('bubble-sem');
+    const bVay = document.getElementById('bubble-vay');
+    const sem = document.getElementById('sem');
+    const vay = document.getElementById('vay');
+
+    function speak(el, text, time = 3500) {
+        el.textContent = text;
+        el.style.opacity = '1';
+        setTimeout(() => el.style.opacity = '0', time);
+    }
+
+    // 1. Поцелуй
+    setTimeout(() => {
+        scene.classList.add('kissing');
+        speak(bSam, 'Я никогда тебя не брошу...');
+        speak(bSem, 'И я тебя никогда не брошу...');
+    }, 2000);
+
+    // 2. Приходит юморная + виноградова чуть отодвигается
+    setTimeout(() => {
+        scene.classList.remove('kissing');
+        
+        // Виноградова отодвигается влево
+        sem.style.left = '42%';
+        
+        // Юморная подходит
+        vay.style.left = '68%';
+        vay.style.opacity = '1';
+    }, 7000);
+
+    // 3. Юморная орёт
+    setTimeout(() => {
+        speak(bVay, 'Ты не достойна её!!!', 4000);
+    }, 8500);
+
+    // 4. Забирает виноградову
+    setTimeout(() => {
+        scene.classList.add('final-kiss');
+        scene.classList.add('sad');
+        speak(bVay, 'Теперь ты моя...');
+    }, 14000);
+
+    // 5. Порочная умирает
+    setTimeout(() => {
+        scene.classList.add('dying');
+        scene.classList.add('dark');
+        speak(bSam, 'Мне так больно...', 4000);
+    }, 18500);
+
+    setTimeout(() => {
+        speak(bSam, 'Я умираю от боли...', 4500);
+    }, 23000);
+</script>
+</body>
+</html>
